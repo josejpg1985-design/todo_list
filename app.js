@@ -8,6 +8,7 @@ const paginationContainer = document.getElementById('pagination-container');
 const searchInput = document.getElementById('search-input');
 const sortAscBtn = document.getElementById('sort-asc-btn');
 const sortDescBtn = document.getElementById('sort-desc-btn');
+const taskCounter = document.getElementById('task-counter');
 
 // 2. Almacén de datos y estado
 let tasks = [];
@@ -46,6 +47,11 @@ function loadTasks() {
 // --- Lógica de Renderizado Principal ---
 function render() {
     saveTasks();
+
+    // Actualizar contador de tareas
+    const totalTasks = tasks.length;
+    taskCounter.textContent = totalTasks;
+
     const filteredTasks = tasks.filter(task => task.text.toLowerCase().includes(searchTerm));
     renderPaginatedTasks(filteredTasks);
     renderPaginationControls(filteredTasks);
