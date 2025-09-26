@@ -359,3 +359,17 @@ h1 {
     color: var(--primary-color);
     vertical-align: middle; /* Para que se alinee bien con el texto del título */
 }
+
+/* --- Media Query para Diseño Responsivo en Móviles --- */
+@media (max-width: 480px) {
+    .header-container h1 {
+        font-size: 22px; /* Reducimos el título principal */
+    }
+
+    .task-counter-badge {
+        font-size: 14px; /* Reducimos el badge también */
+        padding: 2px 8px;
+        margin-left: 8px;
+    }
+}
+
