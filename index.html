@@ -9,33 +9,30 @@
 <body>
 
     <div class="container">
-            <div class="header-container">
-        <h1>Mi Lista de Tareas</h1>
-        <button id="theme-toggle" title="Cambiar a modo noche/día">🌙</button>
-    </div>
-        <div class="input-container">
-        <input type="text" id="task-input" placeholder="Añadir nueva tarea...">
-        <button id="add-task-btn">Agregar</button>
-    </div>
+        <div class="header-container">
+            <h1>Mi Lista de Tareas</h1>
+            <button id="theme-toggle" title="Cambiar a modo noche/día">🌙</button>
+        </div>
 
-    <div class="controls-container">
+        <div class="input-container">
+            <input type="text" id="task-input" placeholder="Añadir nueva tarea...">
+            <button id="add-task-btn">Agregar</button>
+        </div>
+
         <div class="controls-container">
-        <div class="search-container">
-            <input type="search" id="search-input" placeholder="Buscar tareas...">
+            <div class="search-container">
+                <input type="search" id="search-input" placeholder="Buscar tareas...">
+            </div>
+            <div class="sort-container">
+                <button id="sort-asc-btn" class="sort-btn" title="Ordenar A-Z">A-Z ↓</button>
+                <button id="sort-desc-btn" class="sort-btn" title="Ordenar Z-A">Z-A ↑</button>
+            </div>
         </div>
-        <div class="sort-container">
-            <button id="sort-asc-btn" class="sort-btn" title="Ordenar A-Z">A-Z ↓</button>
-            <button id="sort-desc-btn" class="sort-btn" title="Ordenar Z-A">Z-A ↑</button>
-        </div>
-    </div>
-        <div class="sort-container">
-            <button id="sort-asc-btn" class="sort-btn" title="Ordenar A-Z">A-Z ↓</button>
-            <button id="sort-desc-btn" class="sort-btn" title="Ordenar Z-A">Z-A ↑</button>
-        </div>
-    </div>
+
         <ul id="task-list">
             <!-- Las tareas se añadirán aquí dinámicamente -->
-                </ul>
+        </ul>
+
         <div id="pagination-container" class="pagination-container"></div>
     </div>
 
