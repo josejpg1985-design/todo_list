@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Tareas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+            <div class="header-container">
+        <h1>Mi Lista de Tareas</h1>
+        <button id="theme-toggle" title="Cambiar a modo noche/día">🌙</button>
+    </div>
+        <div class="input-container">
+        <input type="text" id="task-input" placeholder="Añadir nueva tarea...">
+        <button id="add-task-btn">Agregar</button>
+    </div>
+
+    <div class="search-container">
+        <input type="search" id="search-input" placeholder="Buscar tareas...">
+    </div>
+        <ul id="task-list">
+            <!-- Las tareas se añadirán aquí dinámicamente -->
+                </ul>
+        <div id="pagination-container" class="pagination-container"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

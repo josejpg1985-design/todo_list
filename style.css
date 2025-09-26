@@ -1,0 +1,282 @@
+/* --- Variables de Color --- */
+:root {
+    --bg-color: #f4f7f6;
+    --container-bg: #ffffff;
+    --text-color: #333;
+    --header-color: #2c3e50;
+    --primary-color: #3498db;
+    --primary-hover: #2980b9;
+    --border-color: #ddd;
+    --task-bg-even: #f7f9fa;
+    --task-bg-odd: #ffffff;
+    --task-completed-text: #95a5a6;
+    --task-completed-bg: #f8f9f9;
+    --edit-btn-color: #2980b9;
+    --delete-btn-color: #c0392b;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode {
+    --bg-color: #1a1a1a;
+    --container-bg: #2c2c2c;
+    --text-color: #e0e0e0;
+    --header-color: #ffffff;
+    --primary-color: #3498db;
+    --primary-hover: #5dade2;
+    --border-color: #444;
+    --task-bg-even: #333333;
+    --task-bg-odd: #2c2c2c;
+    --task-completed-text: #666;
+    --task-completed-bg: #252525;
+    --edit-btn-color: #5dade2;
+    --delete-btn-color: #e74c3c;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+/* ------------------------- */
+
+/* Estilos Globales */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding-top: 50px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Contenedor Principal */
+.container {
+    background-color: var(--container-bg);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    width: 100%;
+    max-width: 500px;
+    transition: background-color 0.3s;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: var(--header-color);
+    margin: 0; /* Reset margin */
+}
+
+#theme-toggle {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, background-color 0.3s;
+}
+
+#theme-toggle:hover {
+    transform: scale(1.1);
+    background-color: var(--task-bg-even);
+}
+
+
+/* Contenedor del Input y Botón */
+.input-container {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+#task-input {
+    flex-grow: 1;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px 0 0 5px;
+    outline: none;
+    transition: border-color 0.3s;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+#task-input:focus {
+    border-color: var(--primary-color);
+}
+
+#add-task-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#add-task-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+/* --- Estilos de Búsqueda --- */
+.search-container {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+#search-input {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+#search-input:focus {
+    border-color: var(--primary-color);
+}
+
+/* Lista de Tareas */
+#task-list {
+    list-style: none;
+}
+
+#task-list li {
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+/* Colores intercalados para mejor legibilidad */
+#task-list li:nth-child(even) {
+    background-color: var(--task-bg-even);
+}
+
+#task-list li:nth-child(odd) {
+    background-color: var(--task-bg-odd);
+}
+
+/* Estilo para tareas completadas */
+#task-list li.completed .task-text {
+    text-decoration: line-through;
+    color: var(--task-completed-text);
+}
+
+#task-list li.completed {
+    background-color: var(--task-completed-bg);
+}
+
+/* --- Estilos para acciones de tarea --- */
+
+.task-text {
+    cursor: pointer;
+    flex-grow: 1;
+    padding-right: 15px;
+}
+
+.task-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.task-actions button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.task-actions button:hover {
+    transform: scale(1.2);
+}
+
+.edit-btn {
+    color: var(--edit-btn-color);
+}
+
+.delete-btn {
+    color: var(--delete-btn-color);
+}
+
+/* --- Estilos para Borrado Pospuesto --- */
+#task-list li.pending-delete {
+    opacity: 0.7;
+    background-color: var(--delete-btn-color) !important; /* Usar important para sobreescribir colores de fila */
+    transition: all 0.5s ease;
+}
+
+#task-list li.pending-delete .task-text {
+    text-decoration: line-through;
+    text-decoration-color: #ffffff;
+    color: #ffffff;
+}
+
+#task-list li.pending-delete .edit-btn {
+    color: #ffffff;
+    opacity: 0.5;
+}
+
+#task-list li.pending-delete .delete-btn {
+    color: #ffffff;
+}
+
+/* --- Estilos de Paginación --- */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 25px;
+    gap: 8px;
+}
+
+.page-btn {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.page-btn:hover:not(:disabled) {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.page-btn.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.page-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}

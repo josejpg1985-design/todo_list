@@ -1,0 +1,48 @@
+¡Entendido! Aquí tienes el análisis arquitectónico para tu proyecto de lista de tareas.
+
+PROYECTO: App web de lista de tareas (CRUD) con HTML, CSS y JS.
+
+---
+
+### 1. Bloques Principales
+
+Dado que la restricción es usar solo tecnologías de frontend, la arquitectura es sencilla y autocontenida:
+
+*   **Frontend (Cliente-Lado):** Este será el único bloque. Contendrá toda la lógica y la interfaz.
+    *   **Estructura (HTML):** El esqueleto de la aplicación.
+    *   **Presentación (CSS):** El diseño y la apariencia visual.
+    *   **Lógica (JavaScript):** El cerebro de la app; manejará todas las interacciones del usuario (crear, leer, actualizar, borrar tareas).
+*   **Almacenamiento (Base de Datos Local):** No usaremos una base de datos tradicional. En su lugar, la información se guardará directamente en el navegador del usuario usando `localStorage`. Esto permite que las tareas persistan incluso si se cierra la pestaña o el navegador.
+
+### 2. Tecnologías Recomendadas
+
+Nos apegaremos 100% a las restricciones, usando tecnologías que cualquier IA (y humano) puede manejar perfectamente:
+
+*   **HTML5:** Para la estructura semántica (formularios, botones, listas).
+*   **CSS3:** Para un diseño limpio y moderno. Podemos organizar el código con una metodología simple como BEM (Block, Element, Modifier) para que sea fácil de mantener.
+*   **JavaScript (ES6+):** Vainilla JS (JavaScript puro) para toda la funcionalidad. Usaremos características modernas como `arrow functions`, `let/const` y manipulación del DOM.
+
+### 3. Por Dónde Empezar (Plan de Acción)
+
+Este es el camino más directo para construir la app:
+
+1.  **Maquetación HTML (`index.html`):**
+    *   Crear la estructura básica: un título, un campo de texto (`<input>`) para la nueva tarea, un botón (`<button>`) para agregarla y una lista vacía (`<ul>`) para mostrar las tareas.
+
+2.  **Lógica de Creación y Lectura (JavaScript - `app.js`):**
+    *   Capturar el evento de clic del botón.
+    *   Leer el valor del campo de texto.
+    *   Crear una función que renderice una lista de tareas en el HTML. Al principio, puedes usar un array de prueba para visualizarlo.
+
+3.  **Estilos Iniciales (CSS - `style.css`):**
+    *   Añadir estilos básicos para que la aplicación se vea ordenada y sea usable desde el principio.
+
+4.  **Implementar Persistencia (`localStorage`):**
+    *   Modificar el código JS para que, cada vez que se añada o modifique una tarea, el array de tareas se guarde en `localStorage`.
+    *   Al cargar la página, comprobar si hay datos en `localStorage` y, si es así, cargarlos y renderizarlos.
+
+5.  **Completar el CRUD:**
+    *   **Borrar (Delete):** Añadir un botón de "eliminar" a cada tarea en la lista y programar su funcionalidad.
+    *   **Actualizar (Update):** Implementar la capacidad de editar el texto de una tarea existente.
+
+Con estos pasos, tendremos una aplicación funcional y completa, lista para ser desplegada fácilmente.
