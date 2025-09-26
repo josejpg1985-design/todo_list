@@ -1,0 +1,62 @@
+# Guía Rápida de Despliegue con Netlify
+
+Esta guía resume los pasos indispensables para publicar un sitio web estático (HTML, CSS, JavaScript) desde un repositorio de GitHub a una URL pública usando Netlify.
+
+---
+
+### Paso 1: Requisito Previo
+
+*   **Tener tu proyecto en GitHub:** Tu código debe estar subido a un repositorio en tu cuenta de GitHub.
+
+---
+
+### Paso 2: Proceso en Netlify
+
+1.  **Registro:**
+    *   Ve a `app.netlify.com` y regístrate. Se recomienda hacerlo usando tu cuenta de GitHub para una integración más sencilla.
+
+2.  **Importar el Proyecto:**
+    *   En el panel principal de Netlify, busca y haz clic en **"Add new site"** -> **"Import an existing project"**.
+
+3.  **Conectar con el Proveedor de Git:**
+    *   Selecciona **"GitHub"** como la fuente de tu código.
+
+4.  **Autorizar a Netlify:**
+    *   La primera vez, Netlify te pedirá permiso para acceder a tus repositorios de GitHub. Debes autorizar esta conexión. Es una buena práctica de seguridad dar acceso solo a los repositorios que planeas desplegar.
+
+5.  **Seleccionar el Repositorio:**
+    *   Netlify te mostrará una lista de tus repositorios de GitHub. Haz clic en el que quieres desplegar (en nuestro caso, `todo_list`).
+
+---
+
+### Paso 3: Configuración del Despliegue
+
+Esta es la parte más importante. Para un sitio estático simple como el nuestro, la configuración es mínima.
+
+*   **Branch to deploy (Rama a desplegar):**
+    *   **Qué es:** La rama de tu repositorio que Netlify usará para el despliegue.
+    *   **Configuración:** Asegúrate de que esté seleccionada la rama `main`.
+
+*   **Build command (Comando de construcción):**
+    *   **Qué es:** Un comando que se ejecuta para "construir" el sitio (por ejemplo, compilar código de React, SASS, etc.).
+    *   **Configuración:** Para un proyecto de HTML, CSS y JS puros, **se deja completamente vacío**.
+
+*   **Publish directory (Directorio de publicación):**
+    *   **Qué es:** La carpeta que contiene los archivos finales de tu sitio web que se deben publicar.
+    *   **Configuración:** Como nuestro `index.html` está en la raíz del proyecto, **se deja completamente vacío**.
+
+---
+
+### Paso 4: ¡Desplegar!
+
+1.  **Hacer clic en "Deploy site"**: Una vez confirmada la configuración, este botón inicia el proceso.
+
+2.  **Obtener la URL:** En pocos segundos, Netlify termina el despliegue y te proporciona una URL pública y gratuita (ej: `nombre-aleatorio.netlify.app`). Tu sitio ya está en línea en esa dirección.
+
+---
+
+### El Concepto Clave: Despliegue Continuo
+
+Una vez que has conectado GitHub y Netlify, se activa el **Despliegue Continuo**.
+
+*   **¿Qué significa?** Cada vez que subas nuevos cambios a la rama `main` de tu repositorio en GitHub (haciendo `git push`), Netlify lo detectará automáticamente, reconstruirá y redesplegará tu sitio web con las últimas actualizaciones. No necesitas volver a intervenir en la página de Netlify.

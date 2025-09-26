@@ -6,9 +6,11 @@ const themeToggleBtn = document.getElementById('theme-toggle');
 const body = document.body;
 const paginationContainer = document.getElementById('pagination-container');
 const searchInput = document.getElementById('search-input');
+const sortAscBtn = document.getElementById('sort-asc-btn');
+const sortDescBtn = document.getElementById('sort-desc-btn');
 
 // 2. Almacén de datos y estado
-let tasks = []; // Tareas: { text, completed, pendingDelete: { intervalId, countdown } }
+let tasks = [];
 let currentPage = 1;
 const tasksPerPage = 10;
 let searchTerm = '';
@@ -31,10 +33,7 @@ themeToggleBtn.addEventListener('click', () => {
 
 // --- Lógica de Tareas (localStorage) ---
 function saveTasks() {
-    const tasksToSave = tasks.map(task => {
-        const { pendingDelete, ...rest } = task; // No guardar el estado de borrado pendiente
-        return rest;
-    });
+    const tasksToSave = tasks.map(({ pendingDelete, ...rest }) => rest);
     localStorage.setItem('todo-tasks', JSON.stringify(tasksToSave));
 }
 function loadTasks() {
@@ -61,14 +60,12 @@ function renderPaginatedTasks(tasksToRender) {
         const task = tasksToRender[i];
         const originalIndex = tasks.findIndex(originalTask => originalTask === task);
         const li = document.createElement('li');
-
         li.classList.toggle('completed', task.completed);
         li.dataset.index = originalIndex;
 
         const isPendingDelete = !!task.pendingDelete;
         li.classList.toggle('pending-delete', isPendingDelete);
 
-        // Mostrar cuenta regresiva si la tarea está pendiente de borrado
         const deleteBtnContent = isPendingDelete ? `↩️ ${task.pendingDelete.countdown}` : '🗑️';
 
         li.innerHTML = `
@@ -85,84 +82,53 @@ function renderPaginatedTasks(tasksToRender) {
 function renderPaginationControls(tasksToRender) {
     paginationContainer.innerHTML = '';
     const totalPages = Math.ceil(tasksToRender.length / tasksPerPage);
-
     if (totalPages <= 1) return;
 
-    // Botón "Primera"
     const firstButton = document.createElement('button');
     firstButton.classList.add('page-btn');
     firstButton.textContent = '<<';
     firstButton.disabled = currentPage === 1;
-    firstButton.addEventListener('click', () => {
-        if (currentPage !== 1) {
-            currentPage = 1;
-            render();
-        }
-    });
+    firstButton.addEventListener('click', () => { if (currentPage !== 1) { currentPage = 1; render(); } });
     paginationContainer.appendChild(firstButton);
 
-    // Botón "Anterior"
     const prevButton = document.createElement('button');
     prevButton.classList.add('page-btn');
     prevButton.textContent = 'Anterior';
     prevButton.disabled = currentPage === 1;
-    prevButton.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            render();
-        }
-    });
+    prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; render(); } });
     paginationContainer.appendChild(prevButton);
 
-    // Botones de número de página
     for (let i = 1; i <= totalPages; i++) {
         const pageButton = document.createElement('button');
         pageButton.classList.add('page-btn');
         pageButton.textContent = i;
-        if (i === currentPage) {
-            pageButton.classList.add('active');
-        }
-        pageButton.addEventListener('click', () => {
-            currentPage = i;
-            render();
-        });
+        if (i === currentPage) pageButton.classList.add('active');
+        pageButton.addEventListener('click', () => { currentPage = i; render(); });
         paginationContainer.appendChild(pageButton);
     }
 
-    // Botón "Siguiente"
     const nextButton = document.createElement('button');
     nextButton.classList.add('page-btn');
     nextButton.textContent = 'Siguiente';
     nextButton.disabled = currentPage === totalPages;
-    nextButton.addEventListener('click', () => {
-        if (currentPage < totalPages) {
-            currentPage++;
-            render();
-        }
-    });
+    nextButton.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; render(); } });
     paginationContainer.appendChild(nextButton);
 
-    // Botón "Última"
     const lastButton = document.createElement('button');
     lastButton.classList.add('page-btn');
     lastButton.textContent = '>>';
     lastButton.disabled = currentPage === totalPages;
-    lastButton.addEventListener('click', () => {
-        if (currentPage !== totalPages) {
-            currentPage = totalPages;
-            render();
-        }
-    });
+    lastButton.addEventListener('click', () => { if (currentPage !== totalPages) { currentPage = totalPages; render(); } });
     paginationContainer.appendChild(lastButton);
 }
 
 // --- Event Listeners ---
-// ... (Búsqueda y Añadir Tarea sin cambios)
 searchInput.addEventListener('input', e => {
     searchTerm = e.target.value.toLowerCase();
     currentPage = 1;
     render();
 });
+
 addTaskBtn.addEventListener('click', () => {
     const newTaskText = taskInput.value.trim();
     if (newTaskText === '') return;
@@ -178,8 +144,19 @@ addTaskBtn.addEventListener('click', () => {
 });
 taskInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTaskBtn.click(); } });
 
+// Listeners para Ordenamiento
+sortAscBtn.addEventListener('click', () => {
+    tasks.sort((a, b) => a.text.localeCompare(b.text));
+    currentPage = 1;
+    render();
+});
 
-// Listener de acciones de lista con lógica de cuenta regresiva
+sortDescBtn.addEventListener('click', () => {
+    tasks.sort((a, b) => b.text.localeCompare(a.text));
+    currentPage = 1;
+    render();
+});
+
 taskList.addEventListener('click', e => {
     const li = e.target.closest('li');
     if (!li) return;
@@ -189,34 +166,30 @@ taskList.addEventListener('click', e => {
     let shouldRenderNow = false;
 
     if (e.target.classList.contains('delete-btn')) {
-        if (task.pendingDelete) { // --- ACCIÓN DE DESHACER ---
+        if (task.pendingDelete) {
             clearInterval(task.pendingDelete.intervalId);
             delete task.pendingDelete;
             shouldRenderNow = true;
-        } else { // --- INICIAR BORRADO CON CUENTA REGRESIVA ---
-            // Limpiar cualquier otra eliminación pendiente para evitar confusión
+        } else {
             tasks.forEach(t => {
                 if (t.pendingDelete) {
                     clearInterval(t.pendingDelete.intervalId);
                     delete t.pendingDelete;
                 }
             });
-
             task.pendingDelete = { intervalId: null, countdown: 5 };
-            
             const intervalId = setInterval(() => {
                 if (task.pendingDelete.countdown > 1) {
                     task.pendingDelete.countdown--;
-                    render(); // Re-renderizar para mostrar la nueva cuenta
+                    render();
                 } else {
                     clearInterval(task.pendingDelete.intervalId);
-                    tasks.splice(index, 1); // Eliminar la tarea
+                    tasks.splice(index, 1);
                     const totalPages = Math.ceil(tasks.filter(t => t.text.toLowerCase().includes(searchTerm)).length / tasksPerPage);
                     if (currentPage > totalPages) currentPage = totalPages || 1;
-                    render(); // Re-renderizar la lista sin la tarea
+                    render();
                 }
             }, 1000);
-
             task.pendingDelete.intervalId = intervalId;
             shouldRenderNow = true;
         }
