@@ -373,3 +373,53 @@ h1 {
     }
 }
 
+/* --- Estilos del Footer y Botón de Borrado Total --- */
+.footer-actions {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.danger-btn {
+    background-color: transparent;
+    border: 1px solid var(--delete-btn-color);
+    color: var(--delete-btn-color);
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.danger-btn:hover {
+    background-color: var(--delete-btn-color);
+    color: #ffffff;
+}
+
+/* --- Estilos para el Mensaje de Deshacer --- */
+.undo-container {
+    text-align: center;
+    padding: 50px 20px;
+    background-color: var(--task-bg-even);
+    border-radius: 5px;
+    margin: 20px 0;
+}
+
+.undo-message {
+    font-size: 16px;
+}
+
+.undo-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+
