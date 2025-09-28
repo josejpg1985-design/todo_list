@@ -1,0 +1,133 @@
+/* --- Estilos para el Acordeón de Listas --- */
+#lists-container {
+    margin-top: 20px;
+}
+
+.list-accordion {
+    background-color: var(--container-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px var(--shadow-color);
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer;
+    background-color: var(--task-bg-even);
+}
+
+.list-header h3 {
+    margin: 0;
+    color: var(--header-color);
+}
+
+.list-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.list-controls .toggle-list-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.delete-list-btn {
+    background: none;
+    border: 1px solid var(--delete-btn-color);
+    color: var(--delete-btn-color);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.delete-list-btn:hover {
+    background-color: var(--delete-btn-color);
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
+.list-controls .toggle-list-btn:hover {
+    transform: scale(1.1);
+}
+
+.list-body {
+    padding: 15px;
+    border-top: 1px solid var(--border-color);
+    /* Por defecto, el cuerpo estará oculto. Lo manejaremos con JS */
+    display: none;
+}
+
+.list-footer-actions {
+    text-align: right;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Estilos para borrado pospuesto de tarea individual */
+.task-list li.pending-delete {
+    opacity: 0.8;
+    background-color: var(--delete-btn-color) !important;
+    color: #ffffff;
+}
+
+.task-list li.pending-delete .task-text {
+    text-decoration: line-through;
+    color: #ffffff;
+}
+
+.undo-task-btn {
+    background: #ffffff;
+    color: var(--text-color); /* Cambiado para asegurar contraste */
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.undo-task-btn:hover {
+    transform: scale(1.05);
+}
+
+.list-title-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1; /* Para que ocupe el espacio disponible */
+}
+
+.edit-list-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    padding: 0;
+    margin: 0;
+}
+
+.edit-list-btn:hover {
+    transform: scale(1.2);
+}

@@ -5,21 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Tareas</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="accordion.css">
 </head>
 <body>
 
     <div class="container">
         <div class="header-container">
-            <h1>Mi Lista de Tareas <span id="task-counter" class="task-counter-badge"></span></h1>
+            <h1>Mis Listas <span id="task-counter" class="task-counter-badge"></span></h1>
             <button id="theme-toggle" title="Cambiar a modo noche/día">🌙</button>
         </div>
 
-        <div class="input-container">
-            <input type="text" id="task-input" placeholder="Añadir nueva tarea...">
-            <button id="add-task-btn">Agregar</button>
+        <!-- Nuevo formulario para crear listas -->
+        <div class="input-container" id="new-list-container">
+            <input type="text" id="new-list-input" placeholder="Nombre de la nueva lista...">
+            <button id="add-list-btn">Crear Lista</button>
         </div>
 
-        <div class="controls-container">
+        <!-- Contenedor principal para todas las listas (acordeón) -->
+        <div id="lists-container">
+            <!-- Aquí se añadirán las listas dinámicamente -->
+        </div>
+
+        <!-- Estos elementos se moverán o eliminarán más adelante -->
+        <div class="controls-container" style="display: none;">
             <div class="search-container">
                 <input type="search" id="search-input" placeholder="Buscar tareas...">
             </div>
@@ -28,14 +36,8 @@
                 <button id="sort-desc-btn" class="sort-btn" title="Ordenar Z-A">Z-A ↑</button>
             </div>
         </div>
-
-        <ul id="task-list">
-            <!-- Las tareas se añadirán aquí dinámicamente -->
-        </ul>
-
-                <div id="pagination-container" class="pagination-container"></div>
-
-        <div class="footer-actions">
+        <div id="pagination-container" class="pagination-container" style="display: none;"></div>
+        <div class="footer-actions" style="display: none;">
             <button id="delete-all-btn" class="danger-btn">Borrar Todas las Tareas</button>
         </div>
     </div>

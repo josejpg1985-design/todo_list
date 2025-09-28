@@ -1,149 +1,339 @@
 // 1. Obtener referencias a los elementos del DOM
-const taskInput = document.getElementById('task-input');
-const addTaskBtn = document.getElementById('add-task-btn');
-const taskList = document.getElementById('task-list');
 const themeToggleBtn = document.getElementById('theme-toggle');
 const body = document.body;
-const paginationContainer = document.getElementById('pagination-container');
-const searchInput = document.getElementById('search-input');
-const sortAscBtn = document.getElementById('sort-asc-btn');
-const sortDescBtn = document.getElementById('sort-desc-btn');
 const taskCounter = document.getElementById('task-counter');
-const deleteAllBtn = document.getElementById('delete-all-btn');
-const controlsContainer = document.querySelector('.controls-container');
-const footerActions = document.querySelector('.footer-actions');
-const mainContainer = document.querySelector('.container');
+const newListInput = document.getElementById('new-list-input');
+const addListBtn = document.getElementById('add-list-btn');
+const listsContainer = document.getElementById('lists-container');
 
 // 2. Almacén de datos y estado
-let tasks = [];
-let currentPage = 1;
-let searchTerm = '';
-let tempDeletedTasks = [];
-let undoIntervalId = null;
+let lists = [];
 
-// --- Lógica de Paginación Responsiva ---
-function getTasksPerPage() {
-    const width = window.innerWidth;
-    if (width < 768) return 8;   // Móvil
-    if (width < 1024) return 9;  // Tablet
-    return 10;                   // PC
+// --- Lógica de Utilidad ---
+function clearAllPendingDeletes() {
+    lists.forEach(l => {
+        if (l.pendingDeleteAll) {
+            clearInterval(l.pendingDeleteAll.intervalId);
+            delete l.pendingDeleteAll;
+        }
+        if (l.tasks) {
+            l.tasks.forEach(t => {
+                if (t.pendingDelete) {
+                    clearInterval(t.pendingDelete.intervalId);
+                    delete t.pendingDelete;
+                }
+            });
+        }
+    });
 }
 
 // --- Lógica de Tema (Día/Noche) ---
 function applyTheme(theme) { if (theme === 'dark') { body.classList.add('dark-mode'); themeToggleBtn.textContent = '☀️'; } else { body.classList.remove('dark-mode'); themeToggleBtn.textContent = '🌙'; } localStorage.setItem('theme', theme); }
 themeToggleBtn.addEventListener('click', () => { const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark'; applyTheme(newTheme); });
 
-// --- Lógica de Tareas (localStorage) ---
-function saveTasks() { const tasksToSave = tasks.map(({ pendingDelete, ...rest }) => rest); localStorage.setItem('todo-tasks', JSON.stringify(tasksToSave)); }
-function loadTasks() { const storedTasks = localStorage.getItem('todo-tasks'); if (storedTasks) { tasks = JSON.parse(storedTasks); } }
+// --- Lógica de Listas (localStorage) ---
+function saveLists() {
+    localStorage.setItem('todo-lists', JSON.stringify(lists));
+}
+
+function loadLists() {
+    const storedLists = localStorage.getItem('todo-lists');
+    if (storedLists) {
+        lists = JSON.parse(storedLists);
+    }
+}
 
 // --- Lógica de Renderizado Principal ---
 function render() {
-    saveTasks();
-    taskCounter.textContent = tasks.length;
+    saveLists();
+    listsContainer.innerHTML = '';
 
-    const tasksPerPage = getTasksPerPage();
-    const totalPages = Math.ceil(tasks.filter(task => task.text.toLowerCase().includes(searchTerm)).length / tasksPerPage);
-    if (currentPage > totalPages) {
-        currentPage = totalPages || 1;
-    }
+    lists.forEach(list => {
+        const listElement = document.createElement('div');
+        listElement.classList.add('list-accordion');
 
-    const filteredTasks = tasks.filter(task => task.text.toLowerCase().includes(searchTerm));
-    renderPaginatedTasks(filteredTasks);
-    renderPaginationControls(filteredTasks);
+        const isExpanded = list.isExpanded || false;
+        listElement.innerHTML = `
+            <div class="list-header" data-list-id="${list.id}">
+                <div class="list-title-container">
+                    <h3>${list.name}</h3>
+                    <button class="edit-list-btn">✏️</button>
+                </div>
+                <span class="list-controls">
+                    <button class="delete-list-btn danger-btn">🗑️</button>
+                    <button class="toggle-list-btn">${isExpanded ? '-' : '+'}</button>
+                </span>
+            </div>
+            <div class="list-body" style="display: ${isExpanded ? 'block' : 'none'}"></div>
+        `;
+
+        const listBody = listElement.querySelector('.list-body');
+
+        if (list.pendingDeleteAll) {
+            listBody.innerHTML = `
+                <div class="undo-container">
+                    <span class="undo-message">Todas las tareas borradas.</span>
+                    <button class="undo-delete-all-btn danger-btn" data-list-id="${list.id}">Deshacer (${list.pendingDeleteAll.countdown})</button>
+                </div>
+            `;
+        } else {
+            listBody.innerHTML = `
+                <div class="input-container task-input-container">
+                    <input type="text" class="task-input" placeholder="Añadir nueva tarea...">
+                    <button class="add-task-btn">Agregar</button>
+                </div>
+                <ul class="task-list"></ul>
+                <div class="list-footer-actions">
+                    <button class="delete-all-tasks-btn danger-btn">Borrar Todas las Tareas</button>
+                </div>
+            `;
+
+            const taskListUl = listBody.querySelector('.task-list');
+            if (list.tasks && list.tasks.length > 0) {
+                list.tasks.forEach((task, index) => {
+                    const taskLi = document.createElement('li');
+                    taskLi.dataset.taskIndex = index;
+                    taskLi.classList.toggle('completed', task.completed);
+
+                    if (task.pendingDelete) {
+                        taskLi.classList.add('pending-delete');
+                        taskLi.innerHTML = `
+                            <span class="task-text">Borrando...</span>
+                            <div class="task-actions">
+                                <button class="undo-task-btn">Deshacer (${task.pendingDelete.countdown})</button>
+                            </div>
+                        `;
+                    } else {
+                        taskLi.innerHTML = `
+                            <span class="task-text">${task.text}</span>
+                            <div class="task-actions">
+                                <button class="edit-btn">✏️</button>
+                                <button class="delete-btn">🗑️</button>
+                            </div>
+                        `;
+                    }
+                    taskListUl.appendChild(taskLi);
+                });
+            }
+        }
+        listsContainer.appendChild(listElement);
+    });
 }
 
-function renderPaginatedTasks(tasksToRender) {
-    taskList.innerHTML = '';
-    const tasksPerPage = getTasksPerPage();
-    const start = (currentPage - 1) * tasksPerPage;
-    const end = Math.min(start + tasksPerPage, tasksToRender.length);
-
-    for (let i = start; i < end; i++) {
-        const task = tasksToRender[i];
-        const originalIndex = tasks.findIndex(originalTask => originalTask === task);
-        const li = document.createElement('li');
-        li.classList.toggle('completed', task.completed);
-        li.dataset.index = originalIndex;
-        const isPendingDelete = !!task.pendingDelete;
-        li.classList.toggle('pending-delete', isPendingDelete);
-        const deleteBtnContent = isPendingDelete ? `↩️ ${task.pendingDelete.countdown}` : '🗑️';
-        li.innerHTML = `<span class="task-text">${task.text}</span><div class="task-actions"><button class="edit-btn" ${isPendingDelete ? 'disabled' : ''}>✏️</button><button class="delete-btn">${deleteBtnContent}</button></div>`;
-        taskList.appendChild(li);
+// --- Lógica para añadir una nueva lista ---
+function addNewList() {
+    const listName = newListInput.value.trim();
+    if (listName === '') {
+        alert('Por favor, dale un nombre a tu lista.');
+        return;
     }
-}
-
-function renderPaginationControls(tasksToRender) {
-    paginationContainer.innerHTML = '';
-    const tasksPerPage = getTasksPerPage();
-    const totalPages = Math.ceil(tasksToRender.length / tasksPerPage);
-    if (totalPages <= 1) return;
-
-    const firstButton = document.createElement('button');
-    firstButton.classList.add('page-btn');
-    firstButton.textContent = '<<';
-    firstButton.disabled = currentPage === 1;
-    firstButton.addEventListener('click', () => { if (currentPage !== 1) { currentPage = 1; render(); } });
-    paginationContainer.appendChild(firstButton);
-
-    const prevButton = document.createElement('button');
-    prevButton.classList.add('page-btn');
-    prevButton.textContent = 'Anterior';
-    prevButton.disabled = currentPage === 1;
-    prevButton.addEventListener('click', () => { if (currentPage > 1) { currentPage--; render(); } });
-    paginationContainer.appendChild(prevButton);
-
-    for (let i = 1; i <= totalPages; i++) {
-        const pageButton = document.createElement('button');
-        pageButton.classList.add('page-btn');
-        pageButton.textContent = i;
-        if (i === currentPage) pageButton.classList.add('active');
-        pageButton.addEventListener('click', () => { currentPage = i; render(); });
-        paginationContainer.appendChild(pageButton);
+    const isDuplicate = lists.some(list => list.name.toLowerCase() === listName.toLowerCase());
+    if (isDuplicate) {
+        alert('Ya existe una lista con ese nombre.');
+        return;
     }
-
-    const nextButton = document.createElement('button');
-    nextButton.classList.add('page-btn');
-    nextButton.textContent = 'Siguiente';
-    nextButton.disabled = currentPage === totalPages;
-    nextButton.addEventListener('click', () => { if (currentPage < totalPages) { currentPage++; render(); } });
-    paginationContainer.appendChild(nextButton);
-
-    const lastButton = document.createElement('button');
-    lastButton.classList.add('page-btn');
-    lastButton.textContent = '>>';
-    lastButton.disabled = currentPage === totalPages;
-    lastButton.addEventListener('click', () => { if (currentPage !== totalPages) { currentPage = totalPages; render(); } });
-    paginationContainer.appendChild(lastButton);
+    lists.unshift({
+        id: Date.now(),
+        name: listName,
+        tasks: [],
+        isExpanded: false
+    });
+    newListInput.value = '';
+    render();
+    newListInput.focus(); // Devolver el foco al input principal
 }
-
-// --- Lógica de Borrar Todo / Deshacer ---
-function showMainContent(show) { /* ...código sin cambios... */ }
-function showUndoUI(show, countdown = 0) { /* ...código sin cambios... */ }
-function handleUndo() { /* ...código sin cambios... */ }
-deleteAllBtn.addEventListener('click', () => { /* ...código sin cambios... */ });
 
 // --- Event Listeners ---
-window.addEventListener('resize', render);
-searchInput.addEventListener('input', e => { searchTerm = e.target.value.toLowerCase(); currentPage = 1; render(); });
-addTaskBtn.addEventListener('click', () => { const newTaskText = taskInput.value.trim(); if (newTaskText === '') return; const isDuplicate = tasks.some(task => task.text.toLowerCase() === newTaskText.toLowerCase()); if (isDuplicate) { alert('Esa tarea ya existe en la lista.'); return; } tasks.unshift({ text: newTaskText, completed: false }); taskInput.value = ''; currentPage = 1; render(); });
-taskInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTaskBtn.click(); } });
-sortAscBtn.addEventListener('click', () => { tasks.sort((a, b) => a.text.localeCompare(b.text)); currentPage = 1; render(); });
-sortDescBtn.addEventListener('click', () => { tasks.sort((a, b) => b.text.localeCompare(a.text)); currentPage = 1; render(); });
-taskList.addEventListener('click', e => { const li = e.target.closest('li'); if (!li) return; const index = parseInt(li.dataset.index, 10); const task = tasks[index]; let shouldRenderNow = false; if (e.target.classList.contains('delete-btn')) { if (task.pendingDelete) { clearInterval(task.pendingDelete.intervalId); delete task.pendingDelete; shouldRenderNow = true; } else { tasks.forEach(t => { if (t.pendingDelete) { clearInterval(t.pendingDelete.intervalId); delete t.pendingDelete; } }); task.pendingDelete = { intervalId: null, countdown: 5 }; const intervalId = setInterval(() => { if (task.pendingDelete.countdown > 1) { task.pendingDelete.countdown--; render(); } else { clearInterval(task.pendingDelete.intervalId); tasks.splice(index, 1); const tasksPerPage = getTasksPerPage(); const totalPages = Math.ceil(tasks.filter(t => t.text.toLowerCase().includes(searchTerm)).length / tasksPerPage); if (currentPage > totalPages) currentPage = totalPages || 1; render(); } }, 1000); task.pendingDelete.intervalId = intervalId; shouldRenderNow = true; } } else if (e.target.classList.contains('task-text')) { if (!task.pendingDelete) { task.completed = !task.completed; shouldRenderNow = true; } } else if (e.target.classList.contains('edit-btn')) { if (!task.pendingDelete) { const newText = prompt("Edita la tarea:", task.text); if (newText !== null && newText.trim() !== '') { const isDuplicate = tasks.some((t, i) => i !== index && t.text.toLowerCase() === newText.trim().toLowerCase()); if (isDuplicate) { alert('Esa tarea ya existe en la lista.'); } else { task.text = newText.trim(); shouldRenderNow = true; } } } } if (shouldRenderNow) render(); });
+addListBtn.addEventListener('click', addNewList);
+newListInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        addNewList();
+    }
+});
+
+listsContainer.addEventListener('click', e => {
+    const editListBtn = e.target.closest('.edit-list-btn');
+    if (editListBtn) {
+        const listId = parseInt(editListBtn.closest('.list-header').dataset.listId, 10);
+        const list = lists.find(l => l.id === listId);
+        if (list) {
+            const newName = prompt("Nuevo nombre para la lista:", list.name);
+            if (newName !== null && newName.trim() !== '') {
+                const isDuplicate = lists.some(l => l.name.toLowerCase() === newName.trim().toLowerCase() && l.id !== listId);
+                if (isDuplicate) {
+                    alert('Ya existe una lista con ese nombre.');
+                } else {
+                    list.name = newName.trim();
+                    render();
+                }
+            }
+            return;
+        }
+    }
+
+    const deleteListBtn = e.target.closest('.delete-list-btn');
+    if (deleteListBtn) {
+        const listId = parseInt(deleteListBtn.closest('.list-header').dataset.listId, 10);
+        const list = lists.find(l => l.id === listId);
+        if (list) {
+            if (list.tasks.length > 0) {
+                alert('No puedes borrar una lista que contiene tareas. Bórralas primero.');
+            } else {
+                if (confirm(`¿Estás seguro de que quieres eliminar la lista "${list.name}"?`)) {
+                    const listIndex = lists.findIndex(l => l.id === listId);
+                    if (listIndex > -1) {
+                        lists.splice(listIndex, 1);
+                        render();
+                    }
+                }
+            }
+            return;
+        }
+    }
+
+    const listHeader = e.target.closest('.list-header');
+    if (listHeader) {
+        const listId = parseInt(listHeader.dataset.listId, 10);
+        const list = lists.find(l => l.id === listId);
+        if (list) {
+            list.isExpanded = !list.isExpanded;
+            render();
+            return;
+        }
+    }
+
+    const addTaskBtn = e.target.closest('.add-task-btn');
+    if (addTaskBtn) {
+        const listAccordion = addTaskBtn.closest('.list-accordion');
+        const listHeader = listAccordion.querySelector('.list-header');
+        const listId = parseInt(listHeader.dataset.listId, 10);
+        const list = lists.find(l => l.id === listId);
+        if (list) {
+            const taskInput = listAccordion.querySelector('.task-input');
+            const newTaskText = taskInput.value.trim();
+            if (newTaskText === '') return;
+            const isDuplicate = list.tasks.some(task => task.text.toLowerCase() === newTaskText.toLowerCase());
+            if (isDuplicate) {
+                alert('Esa tarea ya existe en esta lista.');
+                return;
+            }
+            list.tasks.unshift({ text: newTaskText, completed: false });
+            taskInput.value = '';
+            render();
+
+            const newListElement = listsContainer.querySelector(`.list-header[data-list-id="${listId}"]`).parentElement;
+            const newInput = newListElement.querySelector('.task-input');
+            if (newInput) {
+                newInput.focus();
+            }
+            return;
+        }
+    }
+
+    const taskLi = e.target.closest('li[data-task-index]');
+    if (taskLi) {
+        const listId = parseInt(taskLi.closest('.list-accordion').querySelector('.list-header').dataset.listId, 10);
+        const list = lists.find(l => l.id === listId);
+        const taskIndex = parseInt(taskLi.dataset.taskIndex, 10);
+        const task = list.tasks[taskIndex];
+        if (!list || !task) return;
+
+        if (e.target.closest('.undo-task-btn')) {
+            if (task.pendingDelete) {
+                clearInterval(task.pendingDelete.intervalId);
+                delete task.pendingDelete;
+            }
+        } else if (e.target.closest('.delete-btn')) {
+            clearAllPendingDeletes();
+            task.pendingDelete = {
+                countdown: 5,
+                intervalId: setInterval(() => {
+                    if (task.pendingDelete && task.pendingDelete.countdown > 1) {
+                        task.pendingDelete.countdown--;
+                    } else {
+                        clearInterval(task.pendingDelete.intervalId);
+                        const currentIndex = list.tasks.findIndex(t => t === task);
+                        if (currentIndex !== -1) list.tasks.splice(currentIndex, 1);
+                    }
+                    render();
+                }, 1000)
+            };
+        } else if (!task.pendingDelete) {
+            if (e.target.classList.contains('task-text')) {
+                task.completed = !task.completed;
+            }
+            if (e.target.classList.contains('edit-btn')) {
+                const newText = prompt("Edita la tarea:", task.text);
+                if (newText !== null && newText.trim() !== '') {
+                    const isDuplicate = list.tasks.some((t, i) => i !== taskIndex && t.text.toLowerCase() === newText.trim().toLowerCase());
+                    if (isDuplicate) {
+                        alert('Esa tarea ya existe en la lista.');
+                    } else {
+                        task.text = newText.trim();
+                    }
+                }
+            }
+        }
+        render();
+        return;
+    }
+
+    const deleteAllBtn = e.target.closest('.delete-all-tasks-btn');
+    if (deleteAllBtn) {
+        const listId = parseInt(deleteAllBtn.closest('.list-accordion').querySelector('.list-header').dataset.listId, 10);
+        const list = lists.find(l => l.id === listId);
+        if (list && list.tasks.length > 0) {
+            clearAllPendingDeletes();
+            list.pendingDeleteAll = {
+                tempTasks: [...list.tasks],
+                countdown: 7,
+                intervalId: setInterval(() => {
+                    if (list.pendingDeleteAll && list.pendingDeleteAll.countdown > 1) {
+                        list.pendingDeleteAll.countdown--;
+                    } else {
+                        clearInterval(list.pendingDeleteAll.intervalId);
+                        delete list.pendingDeleteAll;
+                    }
+                    render();
+                }, 1000)
+            };
+            list.tasks = [];
+            render();
+            return;
+        }
+    }
+
+    const undoDeleteAllBtn = e.target.closest('.undo-delete-all-btn');
+    if (undoDeleteAllBtn) {
+        const listId = parseInt(undoDeleteAllBtn.dataset.listId, 10);
+        const list = lists.find(l => l.id === listId);
+        if (list && list.pendingDeleteAll) {
+            clearInterval(list.pendingDeleteAll.intervalId);
+            list.tasks = list.pendingDeleteAll.tempTasks;
+            delete list.pendingDeleteAll;
+            render();
+            return;
+        }
+    }
+});
+
+listsContainer.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.classList.contains('task-input')) {
+        e.preventDefault();
+        const addTaskBtn = e.target.closest('.input-container').querySelector('.add-task-btn');
+        if (addTaskBtn) {
+            addTaskBtn.click();
+        }
+    }
+});
 
 // --- Carga Inicial ---
 function init() {
     const savedTheme = localStorage.getItem('theme') || 'light';
     applyTheme(savedTheme);
-    loadTasks();
+    loadLists();
     render();
 }
-
-// --- Re-pegar el código de las funciones sin cambios ---
-showMainContent = function(show) { const display = show ? 'flex' : 'none'; controlsContainer.style.display = display; taskList.style.display = show ? 'block' : 'none'; paginationContainer.style.display = display; footerActions.style.display = show ? 'block' : 'none'; };
-showUndoUI = function(show, countdown = 0) { let oldUndoContainer = document.querySelector('.undo-container'); if(oldUndoContainer) oldUndoContainer.remove(); if (show) { showMainContent(false); const undoContainer = document.createElement('div'); undoContainer.className = 'undo-container'; undoContainer.innerHTML = `<span class="undo-message">Todas las tareas borradas.</span><button class="undo-btn">Deshacer (${countdown})</button>`; mainContainer.insertBefore(undoContainer, taskList); undoContainer.querySelector('.undo-btn').addEventListener('click', handleUndo); } else { showMainContent(true); } };
-handleUndo = function() { clearInterval(undoIntervalId); undoIntervalId = null; tasks = [...tempDeletedTasks]; tempDeletedTasks = []; showUndoUI(false); render(); };
-deleteAllBtn.addEventListener('click', () => { if (tasks.length === 0) return; clearInterval(undoIntervalId); tempDeletedTasks = [...tasks]; tasks.length = 0; let countdown = 7; showUndoUI(true, countdown); undoIntervalId = setInterval(() => { countdown--; if (countdown > 0) { showUndoUI(true, countdown); } else { clearInterval(undoIntervalId); undoIntervalId = null; tempDeletedTasks = []; showUndoUI(false); render(); } }, 1000); });
 
 init();
