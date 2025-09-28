@@ -131,3 +131,43 @@
 .edit-list-btn:hover {
     transform: scale(1.2);
 }
+
+/* --- Estilos para Controles de Lista (Ordenamiento) --- */
+.task-controls-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 15px;
+}
+
+.task-controls-header .task-input-container {
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+.sort-container {
+    display: flex;
+    gap: 5px;
+}
+
+.sort-btn {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sort-btn:hover {
+    background-color: var(--task-bg-even);
+}
+
+.sort-btn.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #ffffff;
+}

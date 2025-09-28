@@ -78,9 +78,15 @@ function render() {
             `;
         } else {
             listBody.innerHTML = `
-                <div class="input-container task-input-container">
-                    <input type="text" class="task-input" placeholder="Añadir nueva tarea...">
-                    <button class="add-task-btn">Agregar</button>
+                <div class="task-controls-header">
+                    <div class="input-container task-input-container">
+                        <input type="text" class="task-input" placeholder="Añadir nueva tarea...">
+                        <button class="add-task-btn">Agregar</button>
+                    </div>
+                    <div class="sort-container">
+                        <button class="sort-btn sort-asc-btn ${list.sortOrder === 'asc' ? 'active' : ''}" title="Ordenar A-Z">A-Z ↓</button>
+                        <button class="sort-btn sort-desc-btn ${list.sortOrder === 'desc' ? 'active' : ''}" title="Ordenar Z-A">Z-A ↑</button>
+                    </div>
                 </div>
                 <ul class="task-list"></ul>
                 <div class="list-footer-actions">
@@ -90,9 +96,17 @@ function render() {
 
             const taskListUl = listBody.querySelector('.task-list');
             if (list.tasks && list.tasks.length > 0) {
-                list.tasks.forEach((task, index) => {
+                let tasksToRender = [...list.tasks];
+                if (list.sortOrder === 'asc') {
+                    tasksToRender.sort((a, b) => a.text.localeCompare(b.text));
+                } else if (list.sortOrder === 'desc') {
+                    tasksToRender.sort((a, b) => b.text.localeCompare(a.text));
+                }
+
+                tasksToRender.forEach(task => {
+                    const originalIndex = list.tasks.findIndex(originalTask => originalTask === task);
                     const taskLi = document.createElement('li');
-                    taskLi.dataset.taskIndex = index;
+                    taskLi.dataset.taskIndex = originalIndex;
                     taskLi.classList.toggle('completed', task.completed);
 
                     if (task.pendingDelete) {
@@ -136,11 +150,12 @@ function addNewList() {
         id: Date.now(),
         name: listName,
         tasks: [],
-        isExpanded: false
+        isExpanded: false,
+        sortOrder: 'none' // Propiedad para ordenamiento
     });
     newListInput.value = '';
     render();
-    newListInput.focus(); // Devolver el foco al input principal
+    newListInput.focus();
 }
 
 // --- Event Listeners ---
@@ -203,14 +218,34 @@ listsContainer.addEventListener('click', e => {
         }
     }
 
-    const addTaskBtn = e.target.closest('.add-task-btn');
-    if (addTaskBtn) {
-        const listAccordion = addTaskBtn.closest('.list-accordion');
-        const listHeader = listAccordion.querySelector('.list-header');
-        const listId = parseInt(listHeader.dataset.listId, 10);
+    const sortAscBtn = e.target.closest('.sort-asc-btn');
+    if (sortAscBtn) {
+        const listId = parseInt(sortAscBtn.closest('.list-accordion').querySelector('.list-header').dataset.listId, 10);
         const list = lists.find(l => l.id === listId);
         if (list) {
-            const taskInput = listAccordion.querySelector('.task-input');
+            list.sortOrder = list.sortOrder === 'asc' ? 'none' : 'asc';
+            render();
+            return;
+        }
+    }
+
+    const sortDescBtn = e.target.closest('.sort-desc-btn');
+    if (sortDescBtn) {
+        const listId = parseInt(sortDescBtn.closest('.list-accordion').querySelector('.list-header').dataset.listId, 10);
+        const list = lists.find(l => l.id === listId);
+        if (list) {
+            list.sortOrder = list.sortOrder === 'desc' ? 'none' : 'desc';
+            render();
+            return;
+        }
+    }
+
+    const addTaskBtn = e.target.closest('.add-task-btn');
+    if (addTaskBtn) {
+        const listId = parseInt(addTaskBtn.closest('.list-accordion').querySelector('.list-header').dataset.listId, 10);
+        const list = lists.find(l => l.id === listId);
+        if (list) {
+            const taskInput = addTaskBtn.closest('.input-container').querySelector('.task-input');
             const newTaskText = taskInput.value.trim();
             if (newTaskText === '') return;
             const isDuplicate = list.tasks.some(task => task.text.toLowerCase() === newTaskText.toLowerCase());
@@ -221,12 +256,9 @@ listsContainer.addEventListener('click', e => {
             list.tasks.unshift({ text: newTaskText, completed: false });
             taskInput.value = '';
             render();
-
             const newListElement = listsContainer.querySelector(`.list-header[data-list-id="${listId}"]`).parentElement;
             const newInput = newListElement.querySelector('.task-input');
-            if (newInput) {
-                newInput.focus();
-            }
+            if (newInput) newInput.focus();
             return;
         }
     }
