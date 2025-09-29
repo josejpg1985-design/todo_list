@@ -103,7 +103,19 @@ function render() {
                     tasksToRender.sort((a, b) => b.text.localeCompare(a.text));
                 }
 
-                tasksToRender.forEach(task => {
+<<<<<<< HEAD
+                if (list.sortOrder === 'asc') {
+                    tasksToRender.sort((a, b) => a.text.localeCompare(b.text));
+                } else if (list.sortOrder === 'desc') {
+                    tasksToRender.sort((a, b) => b.text.localeCompare(a.text));
+                }
+
+                tasksToRender.forEach((task, index) => {
+                    const originalIndex = list.tasks.findIndex(originalTask => originalTask === task);
+                    const taskLi = document.createElement('li');
+=======
+                tasksToRender.forEach((task, index) => {
+>>>>>>> feature/numeracion-tareas
                     const originalIndex = list.tasks.findIndex(originalTask => originalTask === task);
                     const taskLi = document.createElement('li');
                     taskLi.dataset.taskIndex = originalIndex;
@@ -119,6 +131,7 @@ function render() {
                         `;
                     } else {
                         taskLi.innerHTML = `
+                            <span class="task-number">${index + 1}.</span>
                             <span class="task-text">${task.text}</span>
                             <div class="task-actions">
                                 <button class="edit-btn">✏️</button>
