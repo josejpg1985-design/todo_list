@@ -131,3 +131,74 @@
 .edit-list-btn:hover {
     transform: scale(1.2);
 }
+
+/* --- Estilos para Controles de Lista (Ordenamiento) --- */
+.task-controls-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 15px;
+}
+
+.task-controls-header .task-input-container {
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+.sort-container {
+    display: flex;
+    gap: 5px;
+}
+
+.sort-btn {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sort-btn:hover {
+    background-color: var(--task-bg-even);
+}
+
+.sort-btn.active {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #ffffff;
+}
+
+/* --- Estilos para la Lista de Tareas y Numeración --- */
+.task-list {
+    list-style: none;
+    padding: 0;
+}
+
+.task-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.task-list li:nth-child(even) {
+    background-color: var(--task-bg-even);
+}
+
+.task-list li:nth-child(odd) {
+    background-color: var(--task-bg-odd);
+}
+
+.task-number {
+    font-weight: bold;
+    color: var(--primary-color);
+    min-width: 20px;
+}
+
