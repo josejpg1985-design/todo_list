@@ -1,0 +1,11 @@
+@import '../../design/tokens.css';
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: background-color 0.3s, color 0.3s;
+}

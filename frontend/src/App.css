@@ -1,0 +1,147 @@
+.todo-list-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: var(--color-light);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+h1 {
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.add-task-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.add-task-form input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+}
+
+.add-task-form button {
+  padding: 10px 15px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.add-task-form button:hover {
+  background-color: #2980b9; /* Darker primary */
+}
+
+.task-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: var(--color-background);
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  transition: background-color 0.2s;
+}
+
+.task-item.completed span {
+  text-decoration: line-through;
+  color: #aaa;
+}
+
+.task-item input[type="checkbox"] {
+  margin-right: 15px;
+  width: 20px;
+  height: 20px;
+}
+
+.task-item span {
+  flex-grow: 1;
+  font-size: 18px;
+}
+
+.delete-button {
+  background-color: var(--color-danger);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 5px 10px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.task-item:hover .delete-button {
+  opacity: 1;
+}
+
+.signout-button {
+  display: block;
+  margin: 20px auto 0;
+  padding: 10px 20px;
+  background-color: var(--color-dark);
+  color: var(--color-light);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+}
+
+/* Styles for the Authentication Form Container */
+.auth-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-light);
+}
+
+.auth-widget {
+   width: 400px;
+   padding: 20px;
+   background-color: var(--color-background);
+   border-radius: var(--border-radius);
+   box-shadow: var(--shadow);
+}
+
+/* Styles for Theme Toggle */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header-container h1 {
+  margin: 0;
+}
+
+.theme-toggle-button {
+  background: none;
+  border: 1px solid var(--color-text);
+  border-radius: var(--border-radius);
+  width: 45px;
+  height: 45px;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  transition: transform 0.2s;
+}
+
+.theme-toggle-button:hover {
+  transform: scale(1.1);
+}

@@ -1,0 +1,55 @@
+**Decálogo Holístico para la Creación de un Proyecto Fullstack Open Source con Agente IA Autónomo**
+
+**HISTORIAL:**
+- **2025-10-30:**
+  - Creación de la estructura de directorios y archivos iniciales (Principios 2, 8, 9, 10).
+  - Inicialización del entorno de backend (Node.js) (Principio 3).
+  - Inicialización del entorno de frontend (Vite + React + TS) (Principio 3).
+  - Definición del esquema y políticas de seguridad de la tabla `tasks` (Principios 5, 7).
+  - Implementación de la autenticación de usuarios (Principio 6).
+  - Implementación de la funcionalidad CRUD de tareas (Principio 1).
+  - Implementación del diseño y estilos CSS (Principio 8).
+  - Implementación de selector de modo oscuro (Principio 8).
+  - Actualización de la documentación (`README.md`, `ARCHITECTURE.md`) (Principio 9).
+  - Despliegue del esquema de la base de datos a producción (Principio 4).
+
+PROYECTO: "LISTA DE TAREAS TO DO".
+
+1. **[COMPLETADO] Define la Intención Central con Claridad**  
+   Antes de generar código, establece el propósito del proyecto: ¿qué problema resuelve? ¿Quién lo usará? La IA debe alinear cada componente (frontend, backend, DB, diseño) con esta intención, asegurando coherencia funcional y ética.
+
+2. **[COMPLETADO] Prioriza la Modularidad desde el Origen**  
+   Estructura el proyecto en carpetas desacopladas: `frontend/`, `backend/`, `database/`, `design/`, `docs/`. Cada módulo debe funcionar de forma independiente pero integrable, facilitando mantenimiento, pruebas y contribuciones comunitarias.
+
+3. **[COMPLETADO] Automatiza la Inicialización con Comandos Lineales**  
+   Proporciona al usuario una secuencia clara y ejecutable de comandos (copiar-pegar) para:  
+   - Crear el repositorio  
+   - [X] Inicializar entornos (Node, Vite, etc.) -> Backend y Frontend inicializados.
+   - [X] Configurar Supabase CLI -> CLI Instalada e inicializada.
+   - [X] Aplicar esquemas de base de datos desde archivos `.sql` externos -> Migración inicial aplicada.
+
+4. **[COMPLETADO] Implementa Supabase como Núcleo Holístico**  
+   Usa Supabase no solo como DB, sino como ecosistema unificado: autenticación JWT, Realtime con WebSockets, y almacenamiento. Configura `supabase/config.toml` para entornos local y remoto desde el inicio.
+
+5. **[COMPLETADO] Aplica RLS (Row Level Security) por Defecto**  
+   Toda tabla debe tener RLS activada desde su creación. Define políticas explícitas en archivos SQL separados (ej. `policies/users_rls.sql`) que se ejecuten tras la migración inicial.
+
+6. **[COMPLETADO] Diseña un Sistema RBAC Basado en Roles de Usuario**  
+   Define roles claros (ej. `guest`, `user`, `admin`) en la base de datos o en una tabla `profiles`. Vincula estos roles a políticas RLS y a lógica de UI condicional en el frontend. La IA debe generar ejemplos de verificación de roles tanto en backend como en frontend.
+
+7. **[COMPLETADO] Externaliza la Gestión de Esquemas**  
+   Almacena todos los esquemas de DB (`tables.sql`, `functions.sql`, `policies.sql`, `seeds.sql`) en la carpeta `database/schemas/`. Incluye un script `database/apply.sh` que el usuario ejecute para aplicarlos linealmente contra su proyecto Supabase.
+
+8. **[COMPLETADO] Integra Diseño CSS con Principios de Accesibilidad y Coherencia**  
+   Usa un sistema de diseño atómico o en capas (tokens → componentes). Incluye un archivo `design/tokens.css` y componentes reutilizables en `frontend/components/`. Asegura contraste, escalabilidad y soporte para modo oscuro.
+
+9. **[COMPLETADO] Documenta para la Comunidad, no solo para el Código**  
+   Genera automáticamente `README.md`, `CONTRIBUTING.md` y `ARCHITECTURE.md` con explicaciones visuales de la arquitectura, diagramas de flujo de autenticación y guías de despliegue. La IA debe incluir plantillas listas para completar.
+
+10. **[COMPLETADO] Cierra el Ciclo con Ética y Sostenibilidad**  
+    Incluye licencia open source (MIT/Apache 2.0), código de conducta y consideraciones de privacidad. La IA debe recordar al usuario que el software no es solo funcional: debe respetar a las personas, sus datos y el planeta.
+
+---
+
+**Nota para el Agente IA Autónomo**:  
+Al generar instrucciones, sigue este decálogo como brújula. Entrega comandos breves, archivos bien nombrados y decisiones técnicas justificadas. Tu rol no es solo codificar, sino guiar hacia un ecosistema digital sano, colaborativo y sostenible.
