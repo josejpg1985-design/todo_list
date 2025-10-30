@@ -18,8 +18,44 @@ export default function TodoList({ session }: { session: Session }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchTasks()
-  }, [session])
+    fetchTasks();
+
+    const channel = supabase
+      .channel('public:tasks')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'tasks',
+          filter: `user_id=eq.${session.user.id}`, // Only listen to changes for the current user
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            // Use a callback with prevTasks to ensure you have the latest state
+            setTasks((prevTasks) => [payload.new as Task, ...prevTasks]);
+          }
+          if (payload.eventType === 'UPDATE') {
+            setTasks((prevTasks) =>
+              prevTasks.map((task) =>
+                task.id === payload.new.id ? (payload.new as Task) : task
+              )
+            );
+          }
+          if (payload.eventType === 'DELETE') {
+            setTasks((prevTasks) =>
+              prevTasks.filter((task) => task.id !== (payload.old as any).id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    // Cleanup function to remove the channel subscription when the component unmounts
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session]); // Rerun effect if session changes
 
   const fetchTasks = async () => {
     try {
@@ -46,17 +82,13 @@ export default function TodoList({ session }: { session: Session }) {
 
     try {
       const { user } = session
-      const { data, error } = await supabase
+      // No .select().single() needed anymore, realtime will handle the update
+      const { error } = await supabase
         .from('tasks')
         .insert({ title: newTask, user_id: user.id })
-        .select()
-        .single()
 
       if (error) throw error
-      if (data) {
-        setTasks([data, ...tasks])
-        setNewTask('')
-      }
+      setNewTask('') // Clear input field
     } catch (error) {
       console.error('Error adding task:', error)
     }
@@ -64,13 +96,13 @@ export default function TodoList({ session }: { session: Session }) {
 
   const toggleTask = async (id: number, is_completed: boolean) => {
     try {
+      // Optimistic update removed, realtime will handle it
       const { error } = await supabase
         .from('tasks')
         .update({ is_completed: !is_completed })
         .eq('id', id)
 
       if (error) throw error
-      setTasks(tasks.map(task => task.id === id ? { ...task, is_completed: !is_completed } : task))
     } catch (error) {
       console.error('Error updating task:', error)
     }
@@ -78,13 +110,13 @@ export default function TodoList({ session }: { session: Session }) {
 
   const deleteTask = async (id: number) => {
     try {
+      // Optimistic update removed, realtime will handle it
       const { error } = await supabase
         .from('tasks')
         .delete()
         .eq('id', id)
 
       if (error) throw error
-      setTasks(tasks.filter(task => task.id !== id))
     } catch (error) {
       console.error('Error deleting task:', error)
     }

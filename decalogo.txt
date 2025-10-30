@@ -29,7 +29,10 @@ PROYECTO: "LISTA DE TAREAS TO DO".
    - [X] Aplicar esquemas de base de datos desde archivos `.sql` externos -> Migración inicial aplicada.
 
 4. **[COMPLETADO] Implementa Supabase como Núcleo Holístico**  
-   Usa Supabase no solo como DB, sino como ecosistema unificado: autenticación JWT, Realtime con WebSockets, y almacenamiento. Configura `supabase/config.toml` para entornos local y remoto desde el inicio.
+   Usa Supabase no solo como DB, sino como ecosistema unificado. Configura `supabase/config.toml` para entornos local y remoto desde el inicio.
+   - [X] Autenticación JWT.
+   - [X] Realtime con WebSockets: Implementado para que las operaciones CRUD sobre las tareas se reflejen instantáneamente en todas las sesiones activas del usuario (multi-dispositivo) sin necesidad de recarga manual.
+   - [X] Almacenamiento.
 
 5. **[COMPLETADO] Aplica RLS (Row Level Security) por Defecto**  
    Toda tabla debe tener RLS activada desde su creación. Define políticas explícitas en archivos SQL separados (ej. `policies/users_rls.sql`) que se ejecuten tras la migración inicial.
